@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zee5-clone-deployment
+spec:
+  replicas: 1  
+  selector:
+    matchLabels:
+      app: zee5-clone
+  template:
+    metadata:
+      labels:
+        app: zee5-clone
+    spec:
+      containers:
+        - name: zee5-clone
+          image: saisamarth21/zee5-clone:latest  
+          ports:
+            - containerPort: 5173
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: NODE_ENV
+              value: "production"
+          command: ["npm", "run", "dev", "--", "--host"]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zee5-clone-service
+spec:
+  selector:
+    app: zee5-clone
+  type: NodePort  
+  ports:
+    - protocol: TCP
+      port: 80   
+      targetPort: 5173  
+      nodePort: 30007  
